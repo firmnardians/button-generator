@@ -59,7 +59,12 @@ function App() {
 							for everyone.
 						</p>
 
-						<small>Open Source: Github</small>
+						<small>
+							Open Source:
+							<a target='_blank' href='https://github.com/firmnardians/button-generator' rel='noreferrer'>
+								Github
+							</a>
+						</small>
 					</div>
 				</div>
 
