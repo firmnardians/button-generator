@@ -2,16 +2,10 @@ import Card from './components/card';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import styled from 'styled-components';
-import { useState } from 'react';
-
-const defaultCss = `display: inline-block;
-		line-height: 1.5;
-		text-align: center;
-		text-decoration: none;
-		vertical-align: middle;
-		cursor: pointer;
-		border: 1px solid transparent;
-		user-select: none;`;
+import { useEffect, useState } from 'react';
+import { DEFAULT_CSS, FONT_WEIGHT } from './data';
+import Input from './components/input';
+import debounce from 'lodash.debounce';
 
 function App() {
 	const [buttonValue, setButtonValue] = useState('Hi, buddy');
@@ -25,7 +19,7 @@ function App() {
 
 	const codeString = `
 	button {
-		${defaultCss}
+		${DEFAULT_CSS}
 		padding: ${paddingY}px ${paddingX}px ;
 		font-size: ${fontSize}px;
 		border-radius: ${borderRadius}px;
@@ -36,7 +30,7 @@ function App() {
 	`;
 
 	const Button = styled.button`
-		${defaultCss}
+		${DEFAULT_CSS}
 		padding: ${paddingY}px ${paddingX}px;
 		font-size: ${fontSize}px;
 		border-radius: ${borderRadius}px;
@@ -44,6 +38,28 @@ function App() {
 		color: ${fontColor};
 		font-weight: ${fontWeight};
 	`;
+
+	const debounceColor = (value, type) => {
+		const debounced = debounce(() => {
+			if (type === 'font') {
+				setFontColor(value);
+			} else {
+				setBgColor(value);
+			}
+		}, 500);
+
+		debounced();
+	};
+
+	useEffect(() => {
+		if (buttonValue.length === 0) {
+			const debounced = debounce(() => {
+				setButtonValue('Hi, buddy');
+			}, 500);
+
+			debounced();
+		}
+	}, [buttonValue]);
 
 	return (
 		<main>
@@ -73,105 +89,37 @@ function App() {
 						<Card>
 							<h5 className='card-title pb-3'>Develop</h5>
 
-							<div className='pb-3'>
-								<label className='form-label'>Button Title</label>
-								<input
-									value={buttonValue}
-									onChange={(e) => setButtonValue(e.target.value)}
-									type='text'
-									className='form-control'
-									placeholder='Title'
-									aria-label='title'
-									aria-describedby='addon-wrapping'
-								/>
-							</div>
+							<Input label='Button Title' type='text' value={buttonValue} onChange={(e) => setButtonValue(e.target.value)} />
 
 							<div className='pb-3'>
 								<label className='form-label'>Font Weight</label>
 								<select onChange={(e) => setFontWeight(e.target.value)} className='form-select' aria-label='font-weight'>
-									<option value='normal'>normal</option>
-									<option value='bold'>bold</option>
-									<option value='bolder'>bolder</option>
-									<option value='lighter'>lighter</option>
-									<option value='100'>100</option>
-									<option value='200'>200</option>
-									<option value='300'>300</option>
-									<option value='400'>400</option>
-									<option value='500'>500</option>
-									<option value='600'>600</option>
-									<option value='700'>700</option>
-									<option value='800'>800</option>
-									<option value='900'>900</option>
-									<option value='initial'>initial</option>
-									<option value='inherit'>inherit</option>
+									{FONT_WEIGHT.map((item, index) => {
+										return (
+											<option key={index} value={item.value}>
+												{item.value}
+											</option>
+										);
+									})}
 								</select>
 							</div>
 
-							<div className='pb-3'>
-								<label className='form-label'>Background Color</label>
-								<input
-									value={bgColor}
-									onChange={(e) => setBgColor(e.target.value)}
-									type='color'
-									className='form-control'
-									aria-describedby='addon-wrapping'
-								/>
-							</div>
+							<Input
+								label='Background Color'
+								type='color'
+								value={bgColor}
+								onChange={(e) => debounceColor(e.target.value, 'background')}
+							/>
 
-							<div className='pb-3'>
-								<label className='form-label'>Font Color</label>
-								<input
-									value={fontColor}
-									onChange={(e) => setFontColor(e.target.value)}
-									type='color'
-									className='form-control'
-									aria-describedby='addon-wrapping'
-								/>
-							</div>
+							<Input label='Font Color' type='color' value={fontColor} onChange={(e) => debounceColor(e.target.value, 'font')} />
 
-							<div className='pb-3'>
-								<label className='form-label'>Font Size</label>
-								<input
-									value={fontSize}
-									onChange={(e) => setFontSize(e.target.value)}
-									type='range'
-									className='form-range'
-									aria-describedby='addon-wrapping'
-								/>
-							</div>
+							<Input type='range' label='Font Size' value={fontSize} onChange={(e) => setFontSize(e.target.value)} />
 
-							<div className='pb-3'>
-								<label className='form-label'>Border Radius</label>
-								<input
-									value={borderRadius}
-									onChange={(e) => setBorderRadius(e.target.value)}
-									type='range'
-									className='form-range'
-									aria-describedby='addon-wrapping'
-								/>
-							</div>
+							<Input type='range' label='Border Radius' value={borderRadius} onChange={(e) => setBorderRadius(e.target.value)} />
 
-							<div className='pb-3'>
-								<label className='form-label'>Padding Top & Bottom</label>
-								<input
-									value={paddingY}
-									onChange={(e) => setPaddingY(e.target.value)}
-									type='range'
-									className='form-range'
-									aria-describedby='addon-wrapping'
-								/>
-							</div>
+							<Input type='range' label='Padding Top & Bottom' value={paddingY} onChange={(e) => setPaddingY(e.target.value)} />
 
-							<div className='pb-3'>
-								<label className='form-label'>Padding Left & Right</label>
-								<input
-									value={paddingX}
-									onChange={(e) => setPaddingX(e.target.value)}
-									type='range'
-									className='form-range'
-									aria-describedby='addon-wrapping'
-								/>
-							</div>
+							<Input type='range' label='Padding Left & Right' value={paddingX} onChange={(e) => setPaddingX(e.target.value)} />
 						</Card>
 					</div>
 
